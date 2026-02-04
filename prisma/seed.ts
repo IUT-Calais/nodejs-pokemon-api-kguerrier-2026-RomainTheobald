@@ -28,7 +28,24 @@ async function main() {
   });
 
   console.log('Seed completed!');
+
+  const fireType = await prisma.type.findUnique({ where: { name: 'Fire' } });
+
+  await prisma.pokemonCard.create({
+    data: {
+      name: 'Charizard',
+      pokedexId: 6,
+      type: { connect: { name: 'Fire' } },
+      lifePoints: 78,
+      size: 1.7,
+      weight: 90.5,
+      imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/pokemon/6.png'
+    }
+  })
+
 }
+
+
 
 main()
   .catch((e) => {
