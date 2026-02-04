@@ -42,6 +42,18 @@ async function main() {
       imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/pokemon/6.png'
     }
   })
+
+  await prisma.pokemonCard.create({
+    data: {
+      name: "Bulbizarre",
+      pokedexId: 1,
+      size: 0.7,
+      type: { connect: { name: 'Grass' } },
+      lifePoints: 45,
+      imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
+    }
+  }
+  )
 }
 
 
