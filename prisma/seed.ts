@@ -42,7 +42,6 @@ async function main() {
       imageUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/pokemon/6.png'
     }
   })
-
 }
 
 
