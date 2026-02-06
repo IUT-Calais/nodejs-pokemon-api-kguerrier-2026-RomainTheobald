@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.pokemonCard.deleteMany();
   await prisma.type.deleteMany();
   await prisma.type.createMany({
     data: [
@@ -52,8 +53,7 @@ async function main() {
       lifePoints: 45,
       imageUrl: "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
     }
-  }
-  )
+  })
 }
 
 
