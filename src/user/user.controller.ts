@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import prisma from '../client.js';
+import prisma from '../client';
 
 export const createUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -55,7 +55,7 @@ export const loginUser = async (req: Request, res: Response) => {
             { expiresIn: process.env.JWT_EXPIRATION || '1h' }
         );
 
-        res.status(200).send({ 
+        res.status(200).send({
             message: 'Connexion réussie',
             token,
             user: {

@@ -1,6 +1,6 @@
 import express from 'express';
-import { pokemonCardRouter } from './pokemonCard/pokemonCard.router.js';
-import { userRouter } from './user/user.router.js';
+import { pokemonCardRouter } from './pokemonCard/pokemonCard.router';
+import { userRouter } from './user/user.router';
 
 export const app = express();
 const port = process.env.PORT || 3000;
