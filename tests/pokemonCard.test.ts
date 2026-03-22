@@ -11,11 +11,13 @@ describe('PokemonCard API', () => {
           name: 'Bulbizarre',
           pokedexId: 1,
           typeId: 1,
+          weaknessId: 2,
           lifePoints: 45,
           size: 0.7,
           weight: 6.9,
           imageUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png',
-          type: { id: 1, name: 'Plante' }
+          type: { id: 1, name: 'Plante' },
+          weakness: { id: 2, name: 'Feu' }
         }
       ];
 
@@ -36,11 +38,13 @@ describe('PokemonCard API', () => {
         name: 'Bulbizarre',
         pokedexId: 1,
         typeId: 1,
+        weaknessId: 2,
         lifePoints: 45,
         size: 0.7,
         weight: 6.9,
         imageUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png',
-        type: { id: 1, name: 'Plante' }
+        type: { id: 1, name: 'Plante' },
+        weakness: { id: 2, name: 'Feu' }
       };
 
       prismaMock.pokemonCard.findUnique.mockResolvedValue(mockPokemonCard);
@@ -51,7 +55,7 @@ describe('PokemonCard API', () => {
       expect(response.body).toEqual(mockPokemonCard);
       expect(prismaMock.pokemonCard.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
-        include: { type: true }
+        include: { type: true, weakness: true }
       });
     });
 
@@ -74,13 +78,15 @@ describe('PokemonCard API', () => {
         lifePoints: 45,
         size: 0.7,
         weight: 6.9,
-        imageUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png'
+        imageUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png',
+        weaknessId: 2
       };
 
       const createdPokemonCard = {
         id: 1,
         ...mockPokemonCardData,
-        type: { id: 1, name: 'Plante' }
+        type: { id: 1, name: 'Plante' },
+        weakness: { id: 2, name: 'Feu' }
       };
 
       prismaMock.pokemonCard.create.mockResolvedValue(createdPokemonCard);
@@ -158,7 +164,8 @@ describe('PokemonCard API', () => {
     it('should update a PokemonCard with valid token', async () => {
       const updateData = {
         name: 'Bulbizarre Updated',
-        lifePoints: 50
+        lifePoints: 50,
+        weaknessId: 3
       };
 
       const updatedPokemonCard = {
@@ -166,11 +173,13 @@ describe('PokemonCard API', () => {
         name: 'Bulbizarre Updated',
         pokedexId: 1,
         typeId: 1,
+        weaknessId: 3,
         lifePoints: 50,
         size: 0.7,
         weight: 6.9,
         imageUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png',
-        type: { id: 1, name: 'Plante' }
+        type: { id: 1, name: 'Plante' },
+        weakness: { id: 3, name: 'Eau' }
       };
 
       prismaMock.pokemonCard.update.mockResolvedValue(updatedPokemonCard);
@@ -236,6 +245,7 @@ describe('PokemonCard API', () => {
         name: 'Bulbizarre',
         pokedexId: 1,
         typeId: 1,
+        weaknessId: 2,
         lifePoints: 45,
         size: 0.7,
         weight: 6.9,

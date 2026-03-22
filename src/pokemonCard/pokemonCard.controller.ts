@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import prisma from '../client';
 export const getPokemonCards = async (_req: Request, res: Response) => {
-    const pokemonCards = await prisma.pokemonCard.findMany({ include: { type: true } });
+    const pokemonCards = await prisma.pokemonCard.findMany({ include: { type: true, weakness: true } });
     res.status(200).send(pokemonCards);
 }
 
@@ -9,7 +9,7 @@ export const getPokemonCardById = async (req: Request, res: Response) => {
     const { pokemonCardId } = req.params;
     const pokemonCard = await prisma.pokemonCard.findUnique({
         where: { id: parseInt(pokemonCardId) },
-        include: { type: true }
+        include: { type: true, weakness: true }
     });
     if (!pokemonCard) {
         res.status(404).send({ error: 'Pokemon card not found' });
@@ -19,7 +19,7 @@ export const getPokemonCardById = async (req: Request, res: Response) => {
 }
 
 export const createPokemonCard = async (req: Request, res: Response) => {
-    const { name, pokedexId, typeId, lifePoints, size, weight, imageUrl } = req.body;
+    const { name, pokedexId, typeId, lifePoints, size, weight, imageUrl, weaknessId } = req.body;
     try {
         const pokemonCard = await prisma.pokemonCard.create({
             data: {
@@ -29,9 +29,10 @@ export const createPokemonCard = async (req: Request, res: Response) => {
                 lifePoints,
                 size,
                 weight,
-                imageUrl
+                imageUrl,
+                weaknessId
             },
-            include: { type: true }
+            include: { type: true, weakness: true }
         });
         res.status(201).send(pokemonCard);
     } catch (error) {
@@ -41,7 +42,7 @@ export const createPokemonCard = async (req: Request, res: Response) => {
 
 export const updatePokemonCard = async (req: Request, res: Response) => {
     const { pokemonCardId } = req.params;
-    const { name, pokedexId, typeId, lifePoints, size, weight, imageUrl } = req.body;
+    const { name, pokedexId, typeId, lifePoints, size, weight, imageUrl, weaknessId } = req.body;
     try {
         const pokemonCard = await prisma.pokemonCard.update({
             where: { id: parseInt(pokemonCardId) },
@@ -52,9 +53,10 @@ export const updatePokemonCard = async (req: Request, res: Response) => {
                 lifePoints,
                 size,
                 weight,
-                imageUrl
+                imageUrl,
+                weaknessId
             },
-            include: { type: true }
+            include: { type: true, weakness: true }
         });
         res.status(200).send(pokemonCard);
     } catch (error) {
