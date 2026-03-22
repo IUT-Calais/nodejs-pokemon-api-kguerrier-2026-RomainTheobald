@@ -180,4 +180,191 @@ describe('User API', () => {
       expect(response.body).toEqual({ error: 'Login failed' });
     });
   });
+
+  describe('GET /users', () => {
+    it('should fetch all users', async () => {
+      const mockUsers = [
+        {
+          id: 1,
+          email: 'user1@example.com',
+          password: 'hashedPassword1'
+        },
+        {
+          id: 2,
+          email: 'user2@example.com',
+          password: 'hashedPassword2'
+        }
+      ];
+
+      prismaMock.user.findMany.mockResolvedValue(mockUsers);
+
+      const response = await request(app).get('/users');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockUsers);
+      expect(prismaMock.user.findMany).toHaveBeenCalled();
+    });
+
+    it('should return 400 if retrieval fails', async () => {
+      prismaMock.user.findMany.mockRejectedValue(new Error('Database error'));
+
+      const response = await request(app).get('/users');
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'Failed to retrieve users' });
+    });
+  });
+
+  describe('GET /users/:userId', () => {
+    it('should fetch a user by ID', async () => {
+      const mockUser = {
+        id: 1,
+        email: 'user1@example.com',
+        password: 'hashedPassword'
+      };
+
+      prismaMock.user.findUnique.mockResolvedValue(mockUser);
+
+      const response = await request(app).get('/users/1');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockUser);
+      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 }
+      });
+    });
+
+    it('should return 404 if user not found', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+
+      const response = await request(app).get('/users/999');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'User not found' });
+    });
+
+    it('should return 404 if retrieval fails', async () => {
+      prismaMock.user.findUnique.mockRejectedValue(new Error('Database error'));
+
+      const response = await request(app).get('/users/1');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'User not found' });
+    });
+  });
+
+  describe('PATCH /users/:userId', () => {
+    it('should update a user with valid token', async () => {
+      const updateData = {
+        email: 'updated@example.com'
+      };
+
+      const updatedUser = {
+        id: 1,
+        email: 'updated@example.com',
+        password: 'hashedPassword'
+      };
+
+      prismaMock.user.update.mockResolvedValue(updatedUser);
+
+      const response = await request(app)
+        .patch('/users/1')
+        .set('Authorization', 'Bearer mockedToken')
+        .send(updateData);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(updatedUser);
+      expect(prismaMock.user.update).toHaveBeenCalled();
+    });
+
+    it('should update user password with valid token', async () => {
+      const updateData = {
+        password: 'newPassword123'
+      };
+
+      const updatedUser = {
+        id: 1,
+        email: 'user@example.com',
+        password: 'hashedNewPassword'
+      };
+
+      prismaMock.user.update.mockResolvedValue(updatedUser);
+
+      const response = await request(app)
+        .patch('/users/1')
+        .set('Authorization', 'Bearer mockedToken')
+        .send(updateData);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(updatedUser);
+    });
+
+    it('should return 401 if no token provided', async () => {
+      const updateData = {
+        email: 'updated@example.com'
+      };
+
+      const response = await request(app)
+        .patch('/users/1')
+        .send(updateData);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Token manquant' });
+    });
+
+    it('should return 404 if user not found', async () => {
+      const updateData = {
+        email: 'updated@example.com'
+      };
+
+      prismaMock.user.update.mockRejectedValue(new Error('Not found'));
+
+      const response = await request(app)
+        .patch('/users/999')
+        .set('Authorization', 'Bearer mockedToken')
+        .send(updateData);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'User not found' });
+    });
+  });
+
+  describe('DELETE /users/:userId', () => {
+    it('should delete a user with valid token', async () => {
+      const deletedUser = {
+        id: 1,
+        email: 'user@example.com',
+        password: 'hashedPassword'
+      };
+
+      prismaMock.user.delete.mockResolvedValue(deletedUser);
+
+      const response = await request(app)
+        .delete('/users/1')
+        .set('Authorization', 'Bearer mockedToken');
+
+      expect(response.status).toBe(204);
+      expect(prismaMock.user.delete).toHaveBeenCalledWith({
+        where: { id: 1 }
+      });
+    });
+
+    it('should return 401 if no token provided', async () => {
+      const response = await request(app).delete('/users/1');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Token manquant' });
+    });
+
+    it('should return 404 if user not found', async () => {
+      prismaMock.user.delete.mockRejectedValue(new Error('Not found'));
+
+      const response = await request(app)
+        .delete('/users/999')
+        .set('Authorization', 'Bearer mockedToken');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'User not found' });
+    });
+  });
 });

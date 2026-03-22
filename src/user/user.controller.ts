@@ -67,3 +67,71 @@ export const loginUser = async (req: Request, res: Response) => {
         res.status(400).send({ error: 'Login failed' });
     }
 }
+
+export const getUsers = async (_req: Request, res: Response) => {
+    try {
+        const users = await prisma.user.findMany();
+        res.status(200).send(users);
+    } catch (error) {
+        res.status(400).send({ error: 'Failed to retrieve users' });
+    }
+}
+
+export const getUserById = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: parseInt(userId) }
+        });
+
+        if (!user) {
+            res.status(404).send({ error: 'User not found' });
+            return;
+        }
+
+        res.status(200).send(user);
+    } catch (error) {
+        res.status(404).send({ error: 'User not found' });
+    }
+}
+
+export const updateUser = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const { email, password } = req.body;
+
+    try {
+        let updateData: any = {};
+
+        if (email) {
+            updateData.email = email;
+        }
+
+        if (password) {
+            updateData.password = await bcrypt.hash(password, 10);
+        }
+
+        const user = await prisma.user.update({
+            where: { id: parseInt(userId) },
+            data: updateData
+        });
+
+        res.status(200).send(user);
+    } catch (error) {
+        res.status(404).send({ error: 'User not found' });
+    }
+}
+
+export const deleteUser = async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    try {
+        await prisma.user.delete({
+            where: { id: parseInt(userId) }
+        });
+
+        res.status(204).send();
+    } catch (error) {
+        res.status(404).send({ error: 'User not found' });
+    }
+}
