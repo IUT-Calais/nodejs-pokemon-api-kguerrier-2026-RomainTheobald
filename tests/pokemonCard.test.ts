@@ -114,6 +114,26 @@ describe('PokemonCard API', () => {
       expect(response.body).toEqual({ error: 'Token manquant' });
     });
 
+    it('should return 401 if token is invalid', async () => {
+      const mockPokemonCardData = {
+        name: 'Bulbizarre',
+        pokedexId: 1,
+        typeId: 1,
+        lifePoints: 45,
+        size: 0.7,
+        weight: 6.9,
+        imageUrl: 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png'
+      };
+
+      const response = await request(app)
+        .post('/pokemon-cards')
+        .set('Authorization', 'Bearer invalidToken')
+        .send(mockPokemonCardData);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Token invalide ou expiré' });
+    });
+
     it('should return 400 if creation fails', async () => {
       const mockPokemonCardData = {
         name: 'Bulbizarre',
@@ -178,6 +198,20 @@ describe('PokemonCard API', () => {
       expect(response.body).toEqual({ error: 'Token manquant' });
     });
 
+    it('should return 401 if token is invalid', async () => {
+      const updateData = {
+        name: 'Bulbizarre Updated'
+      };
+
+      const response = await request(app)
+        .patch('/pokemon-cards/1')
+        .set('Authorization', 'Bearer invalidToken')
+        .send(updateData);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Token invalide ou expiré' });
+    });
+
     it('should return 404 if PokemonCard not found', async () => {
       const updateData = {
         name: 'Bulbizarre Updated'
@@ -225,6 +259,15 @@ describe('PokemonCard API', () => {
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: 'Token manquant' });
+    });
+
+    it('should return 401 if token is invalid', async () => {
+      const response = await request(app)
+        .delete('/pokemon-cards/1')
+        .set('Authorization', 'Bearer invalidToken');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Token invalide ou expiré' });
     });
 
     it('should return 404 if PokemonCard not found', async () => {

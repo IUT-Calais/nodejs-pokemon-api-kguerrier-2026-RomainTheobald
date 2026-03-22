@@ -163,5 +163,21 @@ describe('User API', () => {
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: 'Invalid password' });
     });
+
+    it('should return 400 if login fails with database error', async () => {
+      const loginData = {
+        email: 'admin@gmail.com',
+        password: 'truePassword'
+      };
+
+      prismaMock.user.findUnique.mockRejectedValue(new Error('Database error'));
+
+      const response = await request(app)
+        .post('/users/login')
+        .send(loginData);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'Login failed' });
+    });
   });
 });
